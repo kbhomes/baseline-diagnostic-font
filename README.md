@@ -5,6 +5,8 @@
 Font that can be used for validating baseline alignments. This project contains
 the build system for the font using the [fonttools] Python library.
 
+**Built font files can be found in the [./dist](./dist) folder.**
+
 ## Building
 
 This project uses [uv] for dependency management. Use `uv run` to build the font

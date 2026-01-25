@@ -12,21 +12,21 @@ two glyphs in the font:
 
 It has the following baselines:
 
-| Baseline/Metric   | Value | BASE Value | OS/2 Value     | hhea Value |
-|-------------------|-------|------------|----------------|------------|
-| ascent            |   800 |            | sTypoAscender  | ascent     |
-| ideographic-over  |   750 | Idtp       |                |            |
-| hanging           |   650 | hang       |                |            |
-| cap-height        |   550 |            | sCapHeight     |            |
-| math              |   450 | math       |                |            |
-| /central/         |   350 |            |                |            |
-| /em-middle/       |   300 |            |                |            |
-| x-height          |   250 |            | sxHeight       |            |
-| /x-middle/        |   150 |            |                |            |
-| alphabetic        |    50 | romn       |                |            |
-| /zero/            |       |            |                |            |
-| ideographic-under |   -50 | ideo       |                |            |
-| descent           |  -200 |            | sTypoDescender | descent    |
+| Baseline/Metric   | Coordinate | BASE Value | OS/2 Value     | hhea Value |
+|-------------------|------------|------------|----------------|------------|
+| ascent            |        800 |            | sTypoAscender  | ascent     |
+| ideographic-over  |        750 | Idtp       |                |            |
+| hanging           |        650 | hang       |                |            |
+| cap-height        |        550 |            | sCapHeight     |            |
+| math              |        450 | math       |                |            |
+| /central/         |        350 |            |                |            |
+| /em-middle/       |        300 |            |                |            |
+| x-height          |        250 |            | sxHeight       |            |
+| /x-middle/        |        150 |            |                |            |
+| alphabetic        |         50 | romn       |                |            |
+| /zero/            |            |            |                |            |
+| ideographic-under |        -50 | ideo       |                |            |
+| descent           |       -200 |            | sTypoDescender | descent    |
 
 The `BaselineDiagnosticAlphabeticZero` variant is the same as `Baseline`,
 except the alphabetic baseline is at the common value of 0. This also
