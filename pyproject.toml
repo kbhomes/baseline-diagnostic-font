@@ -1,0 +1,9 @@
+[project]
+name = "baseline-diagnostic-font"
+version = "0.1.0"
+description = "Font that can be used for validating baseline alignments"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "fonttools>=4.61.1",
+]
