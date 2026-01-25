@@ -72,7 +72,7 @@ def write_font_stylesheet():
                * Same as the "BaselineDiagnostic" font, but uses the common alphabetic baseline
                * of 0. This also results in the x-middle baseline being at 125.
                */
-              font-family: "BaselineDiagnostic";
+              font-family: "BaselineDiagnosticAlphabeticZero";
               src: url('./BaselineDiagnosticAlphabeticZero.ttf') format('opentype');
             }
         '''))
