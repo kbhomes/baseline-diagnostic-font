@@ -15,7 +15,7 @@ It has the following baselines:
 | Baseline/Metric   | Coordinate | BASE Value | OS/2 Value     | hhea Value |
 |-------------------|------------|------------|----------------|------------|
 | ascent            |        800 |            | sTypoAscender  | ascent     |
-| ideographic-over  |        750 | Idtp       |                |            |
+| ideographic-over  |        750 | idtp       |                |            |
 | hanging           |        650 | hang       |                |            |
 | cap-height        |        550 |            | sCapHeight     |            |
 | math              |        450 | math       |                |            |

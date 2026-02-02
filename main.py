@@ -8,7 +8,7 @@ def main():
         [
             FontBaseline("OS/2", "sTypoAscender",  None,                    800,    None),
             FontBaseline("hhea", "ascent",         None,                    800,    None),
-            FontBaseline("BASE", "Idtp",           "IDEOGRAPHIC-OVER",      750,    FontBaselineStyle.SOLID),
+            FontBaseline("BASE", "idtp",           "IDEOGRAPHIC-OVER",      750,    FontBaselineStyle.SOLID),
             FontBaseline("BASE", "hang",           "HANGING",               650,    FontBaselineStyle.SOLID),
             FontBaseline("OS/2", "sCapHeight",     "CAP-HEIGHT",            550,    FontBaselineStyle.SOLID),
             FontBaseline("BASE", "math",           "MATH",                  450,    FontBaselineStyle.SOLID),
@@ -33,7 +33,7 @@ def main():
         [
             FontBaseline("OS/2", "sTypoAscender",  None,                    800,    None),
             FontBaseline("hhea", "ascent",         None,                    800,    None),
-            FontBaseline("BASE", "Idtp",           "IDEOGRAPHIC-OVER",      750,    FontBaselineStyle.SOLID),
+            FontBaseline("BASE", "idtp",           "IDEOGRAPHIC-OVER",      750,    FontBaselineStyle.SOLID),
             FontBaseline("BASE", "hang",           "HANGING",               650,    FontBaselineStyle.SOLID),
             FontBaseline("OS/2", "sCapHeight",     "CAP-HEIGHT",            550,    FontBaselineStyle.SOLID),
             FontBaseline("BASE", "math",           "MATH",                  450,    FontBaselineStyle.SOLID),
@@ -99,7 +99,7 @@ def write_font_readme():
             | Baseline/Metric   | Coordinate | BASE Value | OS/2 Value     | hhea Value |
             |-------------------|------------|------------|----------------|------------|
             | ascent            |        800 |            | sTypoAscender  | ascent     |
-            | ideographic-over  |        750 | Idtp       |                |            |
+            | ideographic-over  |        750 | idtp       |                |            |
             | hanging           |        650 | hang       |                |            |
             | cap-height        |        550 |            | sCapHeight     |            |
             | math              |        450 | math       |                |            |
@@ -134,7 +134,7 @@ def write_font_license():
         f.write(dedent(r'''
             Copyright (c) 2026, Sajid Anwar.
 
-            This Font Software is licensed under the SIL Open Font License, Version 1.1.  
+            This Font Software is licensed under the SIL Open Font License, Version 1.1.
             This license is copied below, and is also available with a FAQ at:
             https\://openfontlicense.org
             &nbsp;
