@@ -116,6 +116,18 @@ def write_font_readme():
             except the alphabetic baseline is at the common value of 0. This also
             results in the x-middle baseline being at 125.
 
+            ## Source and Downloads
+            Both the source code and built font files can be found in the [`@sajidanwar.com/baseline-diagnostic-font`][tangled-repo]
+            repository on [Tangled][tangled-home] or the [`kbhomes/baseline-diagnostic-font`][github-repo]
+            repository on [GitHub][github-home].
+
+            This font is built using Python with the [fonttools](https://fonttools.readthedocs.io/en/latest/) library.
+
+            [tangled-repo]: https://tangled.org/sajidanwar.com/baseline-diagnostic-font
+            [tangled-home]: https://tangled.org/
+            [github-repo]: https://github.com/kbhomes/baseline-diagnostic-font
+            [github-home]: https://github.com/
+
             ## License
 
             This font contains [Noto Sans Mono][noto-sans-mono] glyphs in the rendering
