@@ -1,84 +1,129 @@
-from font import FontBaseline, FontBaselineStyle, build_baselines_font
-from textwrap import dedent
+import re
+from font import Font, FontBaseline, FontBaselineStyle, build_baselines_font
+from textwrap import dedent, indent
+from typing import Dict, List
 
 def main():
-    build_baselines_font(
-        "BaselineDiagnostic",
-        "dist/BaselineDiagnostic.ttf",
-        [
-            FontBaseline("OS/2", "sTypoAscender",  None,                    800,    None),
-            FontBaseline("hhea", "ascent",         None,                    800,    None),
-            FontBaseline("BASE", "idtp",           "IDEOGRAPHIC-OVER",      750,    FontBaselineStyle.SOLID),
-            FontBaseline("BASE", "hang",           "HANGING",               650,    FontBaselineStyle.SOLID),
-            FontBaseline("OS/2", "sCapHeight",     "CAP-HEIGHT",            550,    FontBaselineStyle.SOLID),
-            FontBaseline("BASE", "math",           "MATH",                  450,    FontBaselineStyle.SOLID),
-            FontBaseline(None,   None,             "CENTRAL",               350,    FontBaselineStyle.SOLID),
-            FontBaseline(None,   None,             None,                    300,    FontBaselineStyle.DASHED),
-            FontBaseline("OS/2", "sxHeight",       "X-HEIGHT",              250,    FontBaselineStyle.SOLID),
-            FontBaseline(None,   None,             "X-MIDDLE",              150,    FontBaselineStyle.SOLID),
-            FontBaseline("BASE", "romn",           "ALPHABETIC",             50,    FontBaselineStyle.SOLID),
-            FontBaseline(None,   None,             None,                      0,    FontBaselineStyle.DASHED),
-            FontBaseline("BASE", "ideo",           "IDEOGRAPHIC-UNDER",     -50,    FontBaselineStyle.SOLID),
-            FontBaseline("OS/2", "sTypoDescender", None,                   -200,    None),
-            FontBaseline("hhea", "descent",        None,                   -200,    None),
+    fonts = []
+    fonts.append(Font(
+        name="BaselineDiagnostic",
+        description=(dedent("""\
+            Font that can be used for validating baseline alignments. Given the embedded
+            text in the font, this should be used with very large font sizes. There are
+            two glyphs in the font.""")),
+        baselines=[
+            FontBaseline("ascent",               800,   "OS/2", "sTypoAscender",  None,                 None),
+            FontBaseline("ascent",               800,   "hhea", "ascent",         None,                 None),
+            FontBaseline("ideographic-over",     750,   "BASE", "idtp",           "IDEOGRAPHIC-OVER",   FontBaselineStyle.SOLID),
+            FontBaseline("hanging",              650,   "BASE", "hang",           "HANGING",            FontBaselineStyle.SOLID),
+            FontBaseline("cap-height",           550,   "OS/2", "sCapHeight",     "CAP-HEIGHT",         FontBaselineStyle.SOLID),
+            FontBaseline("math",                 450,   "BASE", "math",           "MATH",               FontBaselineStyle.SOLID),
+            FontBaseline("central",              350,   None,   None,             "CENTRAL",            FontBaselineStyle.SOLID),
+            FontBaseline("em-middle",            300,   None,   None,             None,                 FontBaselineStyle.DASHED),
+            FontBaseline("x-height",             250,   "OS/2", "sxHeight",       "X-HEIGHT",           FontBaselineStyle.SOLID),
+            FontBaseline("x-middle",             150,   None,   None,             "X-MIDDLE",           FontBaselineStyle.SOLID),
+            FontBaseline("alphabetic",            50,   "BASE", "romn",           "ALPHABETIC",         FontBaselineStyle.SOLID),
+            FontBaseline("zero",                   0,   None,   None,             None,                 FontBaselineStyle.DASHED),
+            FontBaseline("ideographic-under",    -50,   "BASE", "ideo",           "IDEOGRAPHIC-UNDER",  FontBaselineStyle.SOLID),
+            FontBaseline("descent",             -200,   "OS/2", "sTypoDescender", None,                 None),
+            FontBaseline("descent",             -200,   "hhea", "descent",        None,                 None),
         ]
-    )
-
-    # Same as the "BaselineDiagnostic" font, but uses the common alphabetic
-    # baseline of 0. This also results in the x-middle baseline being at 125.
-
-    build_baselines_font(
-        "BaselineDiagnosticAlphabeticZero",
-        "dist/BaselineDiagnosticAlphabeticZero.ttf",
-        [
-            FontBaseline("OS/2", "sTypoAscender",  None,                    800,    None),
-            FontBaseline("hhea", "ascent",         None,                    800,    None),
-            FontBaseline("BASE", "idtp",           "IDEOGRAPHIC-OVER",      750,    FontBaselineStyle.SOLID),
-            FontBaseline("BASE", "hang",           "HANGING",               650,    FontBaselineStyle.SOLID),
-            FontBaseline("OS/2", "sCapHeight",     "CAP-HEIGHT",            550,    FontBaselineStyle.SOLID),
-            FontBaseline("BASE", "math",           "MATH",                  450,    FontBaselineStyle.SOLID),
-            FontBaseline(None,   None,             "CENTRAL",               350,    FontBaselineStyle.SOLID),
-            FontBaseline(None,   None,             None,                    300,    FontBaselineStyle.DASHED),
-            FontBaseline("OS/2", "sxHeight",       "X-HEIGHT",              250,    FontBaselineStyle.SOLID),
-            FontBaseline(None,   None,             "X-MIDDLE",              125,    FontBaselineStyle.SOLID),
-            FontBaseline("BASE", "romn",           None,                      0,    FontBaselineStyle.DASHED),
-            FontBaseline("BASE", "ideo",           "IDEOGRAPHIC-UNDER",     -50,    FontBaselineStyle.SOLID),
-            FontBaseline("OS/2", "sTypoDescender", None,                   -200,    None),
-            FontBaseline("hhea", "descent",        None,                   -200,    None),
+    ))
+    fonts.append(Font(
+        name="BaselineDiagnosticAlphabeticZero",
+        description=(dedent("""\
+            Same as the "BaselineDiagnostic" font, but uses the common alphabetic baseline
+            of 0. This also results in the x-middle baseline being at 125.""")),
+        baselines=[
+            FontBaseline("ascent",               800,   "OS/2", "sTypoAscender",  None,                 None),
+            FontBaseline("ascent",               800,   "hhea", "ascent",         None,                 None),
+            FontBaseline("ideographic-over",     750,   "BASE", "idtp",           "IDEOGRAPHIC-OVER",   FontBaselineStyle.SOLID),
+            FontBaseline("hanging",              650,   "BASE", "hang",           "HANGING",            FontBaselineStyle.SOLID),
+            FontBaseline("cap-height",           550,   "OS/2", "sCapHeight",     "CAP-HEIGHT",         FontBaselineStyle.SOLID),
+            FontBaseline("math",                 450,   "BASE", "math",           "MATH",               FontBaselineStyle.SOLID),
+            FontBaseline("central",              350,   None,   None,             "CENTRAL",            FontBaselineStyle.SOLID),
+            FontBaseline("em-middle",            300,   None,   None,             None,                 FontBaselineStyle.DASHED),
+            FontBaseline("x-height",             250,   "OS/2", "sxHeight",       "X-HEIGHT",           FontBaselineStyle.SOLID),
+            FontBaseline("x-middle",             125,   None,   None,             "X-MIDDLE",           FontBaselineStyle.SOLID),
+            FontBaseline("alphabetic",             0,   "BASE", "romn",           None,                 FontBaselineStyle.DASHED),
+            FontBaseline("zero",                   0,   None,   None,             None,                 None),
+            FontBaseline("ideographic-under",    -50,   "BASE", "ideo",           "IDEOGRAPHIC-UNDER",  FontBaselineStyle.SOLID),
+            FontBaseline("descent",             -200,   "OS/2", "sTypoDescender", None,                 None),
+            FontBaseline("descent",             -200,   "hhea", "descent",        None,                 None),
         ]
-    )
+    ))
 
-    write_font_stylesheet()
+    write_font_files(fonts)
+    write_font_stylesheet(fonts)
     write_font_readme()
     write_font_license()
 
 
-def write_font_stylesheet():
+def write_font_files(fonts: List[Font]):
+    for font in fonts:
+        build_baselines_font(font.name, f'dist/{font.name}.ttf', font.baselines)
+
+
+def write_font_stylesheet(fonts: List[Font]):
     out_path = "dist/baseline-diagnostic-font.css"
     with open(out_path, "w") as f:
-        f.write(dedent(r'''
-            @font-face {
-              /**
-               * Font that can be used for validating baseline alignments. Given the embedded
-               * text in the font, this should be used with very large font sizes. There are
-               * two glyphs in the font.
-               */
-              font-family: "BaselineDiagnostic";
-              src: url('./BaselineDiagnostic.ttf') format('opentype');
-            }
+        for font in fonts:
+            template = dedent('''
+                @font-face {{
+                  /**
+                {description}
+                   */
+                  font-family: "{name}";
+                  src: url('./{name}.ttf') format('opentype');
+                }}
 
-            @font-face {
-              /**
-               * Same as the "BaselineDiagnostic" font, but uses the common alphabetic baseline
-               * of 0. This also results in the x-middle baseline being at 125.
-               */
-              font-family: "BaselineDiagnosticAlphabeticZero";
-              src: url('./BaselineDiagnosticAlphabeticZero.ttf') format('opentype');
-            }
-        '''))
+                :root {{
+                  /**
+                   * Variables representing the positions of the given baselines/metrics from the top
+                   * of the em-box as a percentage of the em-height. The top of the em-box (ascent) has
+                   * a position of 0, and the bottom of the em-box (descent) has a position of 1.
+                   */
+                {variables}
+                }}
+            ''')
+            description = indent(font.description, '   * ')
+            positions: Dict[str, int] = {}
+            ascent = None
+            descent = None
+
+            for baseline in font.baselines:
+                if baseline.id in positions and positions[baseline.id] != baseline.position:
+                    raise ValueError(f"Baseline metric {baseline.id} has different position values")
+                if baseline.id == 'ascent':
+                    ascent = baseline.position
+                if baseline.id == 'descent':
+                    descent = -1 * baseline.position
+                positions[baseline.id] = baseline.position
+
+            if not ascent or not descent:
+                raise ValueError(f"Required ascent / descent but got {ascent} / {descent}")
+
+            variables = []
+            for baseline, position in positions.items():
+                variables.append(
+                    "--{font_name}-{baseline}: calc(1 - ({position} + {descent}) / {height});".format(
+                        font_name=dashing(font.name),
+                        baseline=baseline,
+                        position=position,
+                        descent=descent,
+                        height=(ascent + descent),
+                    )
+                )
+
+            f.write(template.format(
+                name=font.name,
+                description=description,
+                variables=indent('\n'.join(variables), '  '),
+            ))
         print(f"Wrote stylesheet at {out_path}")
 
 
+# TODO: Generate this README and tables programmatically from the fonts.
 def write_font_readme():
     out_path = "dist/README.md"
     with open(out_path, "w") as f:
@@ -253,6 +298,9 @@ def write_font_license():
             OTHER DEALINGS IN THE FONT SOFTWARE.
         '''))
         print(f"Wrote OFL 1.1 license at {out_path}")
+
+def dashing(value: str):
+    return re.sub(r'(?<!^)(?=[A-Z])', '-', value).lower()
 
 if __name__ == "__main__":
     main()

@@ -26,11 +26,18 @@ FontBaselineStyle.DASHED = FontBaselineStyle("dashed", 8)
 
 @dataclass
 class FontBaseline:
-    type: Union[Literal["BASE", "OS/2", "hhea"], None]
+    id: str
+    position: int
+    table: Union[Literal["BASE", "OS/2", "hhea"], None]
     name: str
     label: str
-    position: int
     style: FontBaselineStyle
+
+@dataclass
+class Font:
+    name: str
+    description: str
+    baselines: List[FontBaseline]
 
 
 @dataclass
@@ -196,8 +203,8 @@ def build_baselines_font(font_name: str, out_path: str, baselines: List[FontBase
         "X": diag_glyph_pen.glyph()
     })
 
-    os2_values = dict((base.name, base.position) for base in baselines if base.type == "OS/2")
-    hhea_values = dict((base.name, base.position) for base in baselines if base.type == "hhea")
+    os2_values = dict((base.name, base.position) for base in baselines if base.table == "OS/2")
+    hhea_values = dict((base.name, base.position) for base in baselines if base.table == "hhea")
 
     style_name = "Regular"
     fb.setupPost()
@@ -216,7 +223,7 @@ def build_baselines_font(font_name: str, out_path: str, baselines: List[FontBase
     fb.setupHead(unitsPerEm=EM_SIZE)
 
     font = fb.font
-    bases = list(sorted(filter(lambda base: base.type == "BASE", baselines), key=lambda base: base.name))
+    bases = list(sorted(filter(lambda base: base.table == "BASE", baselines), key=lambda base: base.name))
     base_names = list(base.name for base in bases)
 
     base_table = otTables.BASE()
