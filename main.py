@@ -14,6 +14,7 @@ def main():
         baselines=[
             FontBaseline("ascent",               800,   "OS/2", "sTypoAscender",  None,                 None),
             FontBaseline("ascent",               800,   "hhea", "ascent",         None,                 None),
+            FontBaseline("ascent",               800,   "vhea", "ascent",         None,                 None),
             FontBaseline("ideographic-over",     750,   "BASE", "idtp",           "IDEOGRAPHIC-OVER",   FontBaselineStyle.SOLID),
             FontBaseline("hanging",              650,   "BASE", "hang",           "HANGING",            FontBaselineStyle.SOLID),
             FontBaseline("cap-height",           550,   "OS/2", "sCapHeight",     "CAP-HEIGHT",         FontBaselineStyle.SOLID),
@@ -27,6 +28,7 @@ def main():
             FontBaseline("ideographic-under",    -50,   "BASE", "ideo",           "IDEOGRAPHIC-UNDER",  FontBaselineStyle.SOLID),
             FontBaseline("descent",             -200,   "OS/2", "sTypoDescender", None,                 None),
             FontBaseline("descent",             -200,   "hhea", "descent",        None,                 None),
+            FontBaseline("descent",             -200,   "vhea", "descent",        None,                 None),
         ]
     ))
     fonts.append(Font(
@@ -37,6 +39,7 @@ def main():
         baselines=[
             FontBaseline("ascent",               800,   "OS/2", "sTypoAscender",  None,                 None),
             FontBaseline("ascent",               800,   "hhea", "ascent",         None,                 None),
+            FontBaseline("ascent",               800,   "vhea", "ascent",         None,                 None),
             FontBaseline("ideographic-over",     750,   "BASE", "idtp",           "IDEOGRAPHIC-OVER",   FontBaselineStyle.SOLID),
             FontBaseline("hanging",              650,   "BASE", "hang",           "HANGING",            FontBaselineStyle.SOLID),
             FontBaseline("cap-height",           550,   "OS/2", "sCapHeight",     "CAP-HEIGHT",         FontBaselineStyle.SOLID),
@@ -50,6 +53,7 @@ def main():
             FontBaseline("ideographic-under",    -50,   "BASE", "ideo",           "IDEOGRAPHIC-UNDER",  FontBaselineStyle.SOLID),
             FontBaseline("descent",             -200,   "OS/2", "sTypoDescender", None,                 None),
             FontBaseline("descent",             -200,   "hhea", "descent",        None,                 None),
+            FontBaseline("descent",             -200,   "vhea", "descent",        None,                 None),
         ]
     ))
 

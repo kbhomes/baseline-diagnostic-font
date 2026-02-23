@@ -8,9 +8,6 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont, getTableClass, newTable
 from fontTools.ttLib.tables import otTables
 
-EM_ASCENT = 800
-EM_DESCENT = 200
-EM_SIZE = EM_ASCENT + EM_DESCENT
 BORDER_WIDTH = 12
 
 
@@ -145,10 +142,10 @@ def draw_line(pen, y, start, end, style="solid", stroke_width=8):
         draw_dashed_line(pen, y, start, end, stroke_width=stroke_width)
 
 
-def draw_baseline(pen, font, y, label, style="solid", stroke_width=8):
+def draw_baseline(pen, font, y, em_size, label, style="solid", stroke_width=8):
     if label:
         drawn_text = draw_text_centered(
-            pen, font, label, EM_SIZE / 2, y, font_size=50, scale_y=1, letter_gap=0
+            pen, font, label, em_size / 2, y, font_size=50, scale_y=1, letter_gap=0
         )
         draw_line(
             pen,
@@ -164,7 +161,7 @@ def draw_baseline(pen, font, y, label, style="solid", stroke_width=8):
             stroke_width=stroke_width,
             y=y,
             start=drawn_text.x + drawn_text.width + BORDER_WIDTH,
-            end=EM_SIZE - BORDER_WIDTH,
+            end=em_size - BORDER_WIDTH,
         )
     else:
         draw_line(
@@ -173,16 +170,23 @@ def draw_baseline(pen, font, y, label, style="solid", stroke_width=8):
             stroke_width=stroke_width,
             y=y,
             start=BORDER_WIDTH,
-            end=EM_SIZE - BORDER_WIDTH,
+            end=em_size - BORDER_WIDTH,
         )
 
 
 def build_baselines_font(font_name: str, out_path: str, baselines: List[FontBaseline]):
+    ascent = next(baseline.position for baseline in baselines if baseline.id == 'ascent')
+    descent = next(baseline.position for baseline in baselines if baseline.id == 'descent')
+    em_size = ascent - descent
+
+    if not ascent or not descent:
+        raise ValueError(f"Required ascent / descent but got {ascent} / {descent}")
+
     empty_glyph_pen = TTGlyphPen(None)
-    draw_bordered_rectangle(empty_glyph_pen, 0, -EM_DESCENT, EM_SIZE, EM_ASCENT, BORDER_WIDTH)
+    draw_bordered_rectangle(empty_glyph_pen, 0, descent, em_size, ascent, BORDER_WIDTH)
 
     diag_glyph_pen = TTGlyphPen(None)
-    draw_bordered_rectangle(diag_glyph_pen, 0, -EM_DESCENT, EM_SIZE, EM_ASCENT, BORDER_WIDTH)
+    draw_bordered_rectangle(diag_glyph_pen, 0, descent, em_size, ascent, BORDER_WIDTH)
     label_font = TTFont("./support/noto/NotoSansMono-Bold.ttf")
     for baseline in baselines:
         if baseline.style:
@@ -190,12 +194,13 @@ def build_baselines_font(font_name: str, out_path: str, baselines: List[FontBase
                 diag_glyph_pen,
                 label_font,
                 baseline.position,
+                em_size,
                 baseline.label,
                 style=baseline.style.stroke_style,
                 stroke_width=baseline.style.stroke_width,
             )
 
-    fb = FontBuilder(EM_SIZE, isTTF=True)
+    fb = FontBuilder(em_size, isTTF=True)
     fb.setupGlyphOrder([".notdef", "X"])
     fb.setupCharacterMap({ ord("X"): "X" })
     fb.setupGlyf({
@@ -205,6 +210,7 @@ def build_baselines_font(font_name: str, out_path: str, baselines: List[FontBase
 
     os2_values = dict((base.name, base.position) for base in baselines if base.table == "OS/2")
     hhea_values = dict((base.name, base.position) for base in baselines if base.table == "hhea")
+    vhea_values = dict((base.name, base.position) for base in baselines if base.table == "vhea")
 
     style_name = "Regular"
     fb.setupPost()
@@ -217,10 +223,11 @@ def build_baselines_font(font_name: str, out_path: str, baselines: List[FontBase
         "psName": f"{font_name}-{style_name}",
         "version": "Version 1.0",
     })
-    fb.setupHorizontalMetrics({".notdef": (EM_SIZE, 0), "X": (EM_SIZE, 0)})
+    fb.setupHorizontalMetrics({".notdef": (em_size, 0), "X": (em_size, 0)})
     fb.setupOS2(**os2_values)
     fb.setupHorizontalHeader(**hhea_values)
-    fb.setupHead(unitsPerEm=EM_SIZE)
+    fb.setupVerticalHeader(**vhea_values)
+    fb.setupHead(unitsPerEm=em_size)
 
     font = fb.font
     bases = list(sorted(filter(lambda base: base.table == "BASE", baselines), key=lambda base: base.name))
@@ -232,6 +239,10 @@ def build_baselines_font(font_name: str, out_path: str, baselines: List[FontBase
     base_table.HorizAxis.BaseTagList = otTables.BaseTagList()
     base_table.HorizAxis.BaseTagList.BaselineTag = base_names
     base_table.HorizAxis.BaseScriptList = otTables.BaseScriptList()
+    base_table.VertAxis = otTables.Axis()
+    base_table.VertAxis.BaseTagList = otTables.BaseTagList()
+    base_table.VertAxis.BaseTagList.BaselineTag = base_names
+    base_table.VertAxis.BaseScriptList = otTables.BaseScriptList()
 
     base_coords = []
     for base in bases:
@@ -247,6 +258,7 @@ def build_baselines_font(font_name: str, out_path: str, baselines: List[FontBase
     base_script.BaseScript.BaseValues.DefaultIndex = base_names.index("romn")
     base_script.BaseScript.BaseValues.BaseCoord = base_coords
     base_table.HorizAxis.BaseScriptList.BaseScriptRecord = [base_script]
+    base_table.VertAxis.BaseScriptList.BaseScriptRecord = [base_script]
     font["BASE"] = newTable("BASE")
     font["BASE"].table = base_table
 
