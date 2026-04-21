@@ -1,6 +1,7 @@
 import os
-from dataclasses import dataclass
-from typing import List, Literal, Union
+from dataclasses import dataclass, field
+from enum import auto, Enum
+from typing import List, Literal, Optional, Union
 
 from fontTools.fontBuilder import FontBuilder
 from fontTools.pens.transformPen import TransformPen
@@ -30,11 +31,27 @@ class FontBaseline:
     label: str
     style: FontBaselineStyle
 
+
+class FontGlyphKind(Enum):
+    EMBOX_FILLED = auto()
+    EMBOX_OUTLINE = auto()
+    PAIR_LAYOUT = auto()
+    PAIR_LABELED = auto()
+
+
+@dataclass
+class FontGlyph:
+    char: str
+    kind: FontGlyphKind
+    baseline_ids: Optional[List[str]] = None
+
+
 @dataclass
 class Font:
     name: str
     description: str
     baselines: List[FontBaseline]
+    glyphs: List[FontGlyph] = field(default_factory=list)
 
 
 @dataclass
@@ -174,7 +191,8 @@ def draw_baseline(pen, font, y, em_size, label, style="solid", stroke_width=8):
         )
 
 
-def build_baselines_font(font_name: str, out_path: str, baselines: List[FontBaseline]):
+def build_baselines_font(font: Font, out_path: str):
+    baselines = font.baselines
     ascent = next(baseline.position for baseline in baselines if baseline.id == 'ascent')
     descent = next(baseline.position for baseline in baselines if baseline.id == 'descent')
     em_size = ascent - descent
@@ -182,12 +200,21 @@ def build_baselines_font(font_name: str, out_path: str, baselines: List[FontBase
     if not ascent or not descent:
         raise ValueError(f"Required ascent / descent but got {ascent} / {descent}")
 
-    empty_glyph_pen = TTGlyphPen(None)
-    draw_bordered_rectangle(empty_glyph_pen, 0, descent, em_size, ascent, BORDER_WIDTH)
+    baseline_by_id = {}
+    for baseline in baselines:
+        if baseline.id not in baseline_by_id:
+            baseline_by_id[baseline.id] = baseline
 
+    # .notdef: bordered rectangle
+    notdef_glyph_pen = TTGlyphPen(None)
+    draw_bordered_rectangle(notdef_glyph_pen, 0, descent, em_size, ascent, BORDER_WIDTH)
+
+    # X: all baselines with style drawn
     diag_glyph_pen = TTGlyphPen(None)
     draw_bordered_rectangle(diag_glyph_pen, 0, descent, em_size, ascent, BORDER_WIDTH)
+
     label_font = TTFont("./support/noto/NotoSansMono-Bold.ttf")
+
     for baseline in baselines:
         if baseline.style:
             draw_baseline(
@@ -200,13 +227,57 @@ def build_baselines_font(font_name: str, out_path: str, baselines: List[FontBase
                 stroke_width=baseline.style.stroke_width,
             )
 
+    glyph_order = [".notdef", "X"]
+    char_map = {ord("X"): "X"}
+    glyf_table = {".notdef": notdef_glyph_pen.glyph(), "X": diag_glyph_pen.glyph()}
+    h_metrics = {".notdef": (em_size, 0), "X": (em_size, 0)}
+
+    for glyph in font.glyphs:
+        cp = ord(glyph.char)
+        name = f"uni{cp:04X}" if cp <= 0xFFFF else f"u{cp:05X}"
+        pen = TTGlyphPen(None)
+
+        if glyph.kind == FontGlyphKind.EMBOX_FILLED:
+            draw_rectangle(pen, 0, descent, em_size, ascent)
+
+        elif glyph.kind == FontGlyphKind.EMBOX_OUTLINE:
+            draw_bordered_rectangle(pen, 0, descent, em_size, ascent, BORDER_WIDTH)
+
+        elif glyph.kind == FontGlyphKind.PAIR_LAYOUT:
+            b1 = baseline_by_id[glyph.baseline_ids[0]]
+            b2 = baseline_by_id[glyph.baseline_ids[1]]
+            lower = min(b1.position, b2.position)
+            upper = max(b1.position, b2.position)
+            draw_rectangle(pen, 0, lower, em_size, upper)
+
+        elif glyph.kind == FontGlyphKind.PAIR_LABELED:
+            draw_bordered_rectangle(pen, 0, descent, em_size, ascent, BORDER_WIDTH)
+            for b in baselines:
+                if b.style and b.label is None:
+                    draw_baseline(pen, label_font, b.position, em_size, None,
+                                  style=b.style.stroke_style, stroke_width=b.style.stroke_width)
+            for bid in glyph.baseline_ids:
+                b = baseline_by_id[bid]
+                style = b.style if b.style else FontBaselineStyle.SOLID
+                draw_baseline(
+                    pen,
+                    label_font,
+                    b.position,
+                    em_size,
+                    b.label,
+                    style=style.stroke_style,
+                    stroke_width=style.stroke_width,
+                )
+
+        glyph_order.append(name)
+        char_map[cp] = name
+        glyf_table[name] = pen.glyph()
+        h_metrics[name] = (em_size, 0)
+
     fb = FontBuilder(em_size, isTTF=True)
-    fb.setupGlyphOrder([".notdef", "X"])
-    fb.setupCharacterMap({ ord("X"): "X" })
-    fb.setupGlyf({
-        ".notdef": empty_glyph_pen.glyph(),
-        "X": diag_glyph_pen.glyph()
-    })
+    fb.setupGlyphOrder(glyph_order)
+    fb.setupCharacterMap(char_map)
+    fb.setupGlyf(glyf_table)
 
     os2_values = dict((base.name, base.position) for base in baselines if base.table == "OS/2")
     hhea_values = dict((base.name, base.position) for base in baselines if base.table == "hhea")
@@ -216,20 +287,19 @@ def build_baselines_font(font_name: str, out_path: str, baselines: List[FontBase
     fb.setupPost()
     fb.setupNameTable({
         "copyright": "Copyright (c) 2026, Sajid Anwar",
-        "familyName": font_name,
+        "familyName": font.name,
         "styleName": style_name,
-        "uniqueFontIdentifier": f"{font_name}-{style_name}",
-        "fullName": f"{font_name}-{style_name}",
-        "psName": f"{font_name}-{style_name}",
+        "uniqueFontIdentifier": f"{font.name}-{style_name}",
+        "fullName": f"{font.name}-{style_name}",
+        "psName": f"{font.name}-{style_name}",
         "version": "Version 1.0",
     })
-    fb.setupHorizontalMetrics({".notdef": (em_size, 0), "X": (em_size, 0)})
+    fb.setupHorizontalMetrics(h_metrics)
     fb.setupOS2(**os2_values)
     fb.setupHorizontalHeader(**hhea_values)
     fb.setupVerticalHeader(**vhea_values)
     fb.setupHead(unitsPerEm=em_size)
 
-    font = fb.font
     bases = list(sorted(filter(lambda base: base.table == "BASE", baselines), key=lambda base: base.name))
     base_names = list(base.name for base in bases)
 
@@ -259,8 +329,8 @@ def build_baselines_font(font_name: str, out_path: str, baselines: List[FontBase
     base_script.BaseScript.BaseValues.BaseCoord = base_coords
     base_table.HorizAxis.BaseScriptList.BaseScriptRecord = [base_script]
     base_table.VertAxis.BaseScriptList.BaseScriptRecord = [base_script]
-    font["BASE"] = newTable("BASE")
-    font["BASE"].table = base_table
+    fb.font["BASE"] = newTable("BASE")
+    fb.font["BASE"].table = base_table
 
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     fb.save(out_path)

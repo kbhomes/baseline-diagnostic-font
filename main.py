@@ -1,9 +1,26 @@
 import re
-from font import Font, FontBaseline, FontBaselineStyle, build_baselines_font
+from font import Font, FontBaseline, FontBaselineStyle, FontGlyph, FontGlyphKind, build_baselines_font
 from textwrap import dedent, indent
 from typing import Dict, List
 
 def main():
+    glyphs = [
+        FontGlyph("x", FontGlyphKind.PAIR_LAYOUT,  ["x-height", "alphabetic"]),
+        FontGlyph("χ", FontGlyphKind.PAIR_LABELED, ["x-height", "alphabetic"]),
+        FontGlyph("B", FontGlyphKind.PAIR_LAYOUT,  ["cap-height", "alphabetic"]),
+        FontGlyph("β", FontGlyphKind.PAIR_LABELED, ["cap-height", "alphabetic"]),
+        FontGlyph("口", FontGlyphKind.PAIR_LAYOUT,  ["ideographic-over", "ideographic-under"]),
+        FontGlyph("日", FontGlyphKind.PAIR_LABELED, ["ideographic-over", "ideographic-under"]),
+        FontGlyph("中", FontGlyphKind.PAIR_LAYOUT,  ["ideographic-face-over", "ideographic-face-under"]),
+        FontGlyph("田", FontGlyphKind.PAIR_LABELED, ["ideographic-face-over", "ideographic-face-under"]),
+        FontGlyph("अ", FontGlyphKind.PAIR_LAYOUT,  ["hanging", "alphabetic"]),
+        FontGlyph("आ", FontGlyphKind.PAIR_LABELED, ["hanging", "alphabetic"]),
+        FontGlyph("+", FontGlyphKind.PAIR_LAYOUT,  ["math", "alphabetic"]),
+        FontGlyph("±", FontGlyphKind.PAIR_LABELED, ["math", "alphabetic"]),
+        FontGlyph("█", FontGlyphKind.EMBOX_FILLED),
+        FontGlyph("□", FontGlyphKind.EMBOX_OUTLINE),
+    ]
+
     fonts = []
     fonts.append(Font(
         name="BaselineDiagnostic",
@@ -12,24 +29,27 @@ def main():
             text in the font, this should be used with very large font sizes. There are
             two glyphs in the font.""")),
         baselines=[
-            FontBaseline("ascent",               800,   "OS/2", "sTypoAscender",  None,                 None),
-            FontBaseline("ascent",               800,   "hhea", "ascent",         None,                 None),
-            FontBaseline("ascent",               800,   "vhea", "ascent",         None,                 None),
-            FontBaseline("ideographic-over",     750,   "BASE", "idtp",           "IDEOGRAPHIC-OVER",   FontBaselineStyle.SOLID),
-            FontBaseline("hanging",              650,   "BASE", "hang",           "HANGING",            FontBaselineStyle.SOLID),
-            FontBaseline("cap-height",           550,   "OS/2", "sCapHeight",     "CAP-HEIGHT",         FontBaselineStyle.SOLID),
-            FontBaseline("math",                 450,   "BASE", "math",           "MATH",               FontBaselineStyle.SOLID),
-            FontBaseline("central",              350,   None,   None,             "CENTRAL",            FontBaselineStyle.SOLID),
-            FontBaseline("em-middle",            300,   None,   None,             None,                 FontBaselineStyle.DASHED),
-            FontBaseline("x-height",             250,   "OS/2", "sxHeight",       "X-HEIGHT",           FontBaselineStyle.SOLID),
-            FontBaseline("x-middle",             150,   None,   None,             "X-MIDDLE",           FontBaselineStyle.SOLID),
-            FontBaseline("alphabetic",            50,   "BASE", "romn",           "ALPHABETIC",         FontBaselineStyle.SOLID),
-            FontBaseline("zero",                   0,   None,   None,             None,                 FontBaselineStyle.DASHED),
-            FontBaseline("ideographic-under",    -50,   "BASE", "ideo",           "IDEOGRAPHIC-UNDER",  FontBaselineStyle.SOLID),
-            FontBaseline("descent",             -200,   "OS/2", "sTypoDescender", None,                 None),
-            FontBaseline("descent",             -200,   "hhea", "descent",        None,                 None),
-            FontBaseline("descent",             -200,   "vhea", "descent",        None,                 None),
-        ]
+            FontBaseline("ascent",                    800,   "OS/2", "sTypoAscender",  None,                  None),
+            FontBaseline("ascent",                    800,   "hhea", "ascent",         None,                  None),
+            FontBaseline("ascent",                    800,   "vhea", "ascent",         None,                  None),
+            FontBaseline("ideographic-over",          750,   "BASE", "idtp",           "IDEOGRAPHIC-OVER",    FontBaselineStyle.SOLID),
+            FontBaseline("hanging",                   650,   "BASE", "hang",           "HANGING",             FontBaselineStyle.SOLID),
+            FontBaseline("ideographic-face-over",     650,   "BASE", "icft",           "IDEO-FACE-OVER",      None),
+            FontBaseline("cap-height",                550,   "OS/2", "sCapHeight",     "CAP-HEIGHT",          FontBaselineStyle.SOLID),
+            FontBaseline("math",                      450,   "BASE", "math",           "MATH",                FontBaselineStyle.SOLID),
+            FontBaseline("central",                   350,   None,   None,             "CENTRAL",             FontBaselineStyle.SOLID),
+            FontBaseline("em-middle",                 300,   None,   None,             None,                  FontBaselineStyle.DASHED),
+            FontBaseline("x-height",                  250,   "OS/2", "sxHeight",       "X-HEIGHT",            FontBaselineStyle.SOLID),
+            FontBaseline("x-middle",                  150,   None,   None,             "X-MIDDLE",            FontBaselineStyle.SOLID),
+            FontBaseline("alphabetic",                 50,   "BASE", "romn",           "ALPHABETIC",          FontBaselineStyle.SOLID),
+            FontBaseline("ideographic-face-under",     50,   "BASE", "icfb",           "IDEO-FACE-UNDER",     None),
+            FontBaseline("zero",                        0,   None,   None,             None,                  FontBaselineStyle.DASHED),
+            FontBaseline("ideographic-under",         -50,   "BASE", "ideo",           "IDEOGRAPHIC-UNDER",   FontBaselineStyle.SOLID),
+            FontBaseline("descent",                  -200,   "OS/2", "sTypoDescender", None,                  None),
+            FontBaseline("descent",                  -200,   "hhea", "descent",        None,                  None),
+            FontBaseline("descent",                  -200,   "vhea", "descent",        None,                  None),
+        ],
+        glyphs=glyphs,
     ))
     fonts.append(Font(
         name="BaselineDiagnosticAlphabeticZero",
@@ -37,24 +57,27 @@ def main():
             Same as the "BaselineDiagnostic" font, but uses the common alphabetic baseline
             of 0. This also results in the x-middle baseline being at 125.""")),
         baselines=[
-            FontBaseline("ascent",               800,   "OS/2", "sTypoAscender",  None,                 None),
-            FontBaseline("ascent",               800,   "hhea", "ascent",         None,                 None),
-            FontBaseline("ascent",               800,   "vhea", "ascent",         None,                 None),
-            FontBaseline("ideographic-over",     750,   "BASE", "idtp",           "IDEOGRAPHIC-OVER",   FontBaselineStyle.SOLID),
-            FontBaseline("hanging",              650,   "BASE", "hang",           "HANGING",            FontBaselineStyle.SOLID),
-            FontBaseline("cap-height",           550,   "OS/2", "sCapHeight",     "CAP-HEIGHT",         FontBaselineStyle.SOLID),
-            FontBaseline("math",                 450,   "BASE", "math",           "MATH",               FontBaselineStyle.SOLID),
-            FontBaseline("central",              350,   None,   None,             "CENTRAL",            FontBaselineStyle.SOLID),
-            FontBaseline("em-middle",            300,   None,   None,             None,                 FontBaselineStyle.DASHED),
-            FontBaseline("x-height",             250,   "OS/2", "sxHeight",       "X-HEIGHT",           FontBaselineStyle.SOLID),
-            FontBaseline("x-middle",             125,   None,   None,             "X-MIDDLE",           FontBaselineStyle.SOLID),
-            FontBaseline("alphabetic",             0,   "BASE", "romn",           None,                 FontBaselineStyle.DASHED),
-            FontBaseline("zero",                   0,   None,   None,             None,                 None),
-            FontBaseline("ideographic-under",    -50,   "BASE", "ideo",           "IDEOGRAPHIC-UNDER",  FontBaselineStyle.SOLID),
-            FontBaseline("descent",             -200,   "OS/2", "sTypoDescender", None,                 None),
-            FontBaseline("descent",             -200,   "hhea", "descent",        None,                 None),
-            FontBaseline("descent",             -200,   "vhea", "descent",        None,                 None),
-        ]
+            FontBaseline("ascent",                    800,   "OS/2", "sTypoAscender",  None,                  None),
+            FontBaseline("ascent",                    800,   "hhea", "ascent",         None,                  None),
+            FontBaseline("ascent",                    800,   "vhea", "ascent",         None,                  None),
+            FontBaseline("ideographic-over",          750,   "BASE", "idtp",           "IDEOGRAPHIC-OVER",    FontBaselineStyle.SOLID),
+            FontBaseline("hanging",                   650,   "BASE", "hang",           "HANGING",             FontBaselineStyle.SOLID),
+            FontBaseline("ideographic-face-over",     650,   "BASE", "icft",           "IDEO-FACE-OVER",      None),
+            FontBaseline("cap-height",                550,   "OS/2", "sCapHeight",     "CAP-HEIGHT",          FontBaselineStyle.SOLID),
+            FontBaseline("math",                      450,   "BASE", "math",           "MATH",                FontBaselineStyle.SOLID),
+            FontBaseline("central",                   350,   None,   None,             "CENTRAL",             FontBaselineStyle.SOLID),
+            FontBaseline("em-middle",                 300,   None,   None,             None,                  FontBaselineStyle.DASHED),
+            FontBaseline("x-height",                  250,   "OS/2", "sxHeight",       "X-HEIGHT",            FontBaselineStyle.SOLID),
+            FontBaseline("x-middle",                  125,   None,   None,             "X-MIDDLE",            FontBaselineStyle.SOLID),
+            FontBaseline("alphabetic",                  0,   "BASE", "romn",           None,                  FontBaselineStyle.DASHED),
+            FontBaseline("ideographic-face-under",     50,   "BASE", "icfb",           "IDEO-FACE-UNDER",     None),
+            FontBaseline("zero",                        0,   None,   None,             None,                  None),
+            FontBaseline("ideographic-under",         -50,   "BASE", "ideo",           "IDEOGRAPHIC-UNDER",   FontBaselineStyle.SOLID),
+            FontBaseline("descent",                  -200,   "OS/2", "sTypoDescender", None,                  None),
+            FontBaseline("descent",                  -200,   "hhea", "descent",        None,                  None),
+            FontBaseline("descent",                  -200,   "vhea", "descent",        None,                  None),
+        ],
+        glyphs=glyphs,
     ))
 
     write_font_files(fonts)
@@ -65,7 +88,7 @@ def main():
 
 def write_font_files(fonts: List[Font]):
     for font in fonts:
-        build_baselines_font(font.name, f'dist/{font.name}.ttf', font.baselines)
+        build_baselines_font(font, f'dist/{font.name}.ttf')
 
 
 def write_font_stylesheet(fonts: List[Font]):
@@ -137,33 +160,60 @@ def write_font_readme():
             ## Overview
 
             Font that can be used for validating baseline alignments. Given the embedded
-            text in the font, this should be used with very large font sizes. There are
-            two glyphs in the font:
+            text in the font, this should be used with very large font sizes.
 
-              - `X` (U+0058) which has all baselines drawn
-              - `.notdef` (for all other characters) which is an empty box
+            ## Baselines and Metrics
 
-            It has the following baselines:
+            | Baseline/Metric        | Coordinate | BASE Value | OS/2 Value     | hhea Value |
+            |------------------------|------------|------------|----------------|------------|
+            | ascent                 |        800 |            | sTypoAscender  | ascent     |
+            | ideographic-over       |        750 | idtp       |                |            |
+            | hanging                |        650 | hang       |                |            |
+            | ideographic-face-over  |        650 | icft       |                |            |
+            | cap-height             |        550 |            | sCapHeight     |            |
+            | math                   |        450 | math       |                |            |
+            | /central/              |        350 |            |                |            |
+            | /em-middle/            |        300 |            |                |            |
+            | x-height               |        250 |            | sxHeight       |            |
+            | /x-middle/             |        150 |            |                |            |
+            | alphabetic             |         50 | romn       |                |            |
+            | ideographic-face-under |         50 | icfb       |                |            |
+            | /zero/                 |          0 |            |                |            |
+            | ideographic-under      |        -50 | ideo       |                |            |
+            | descent                |       -200 |            | sTypoDescender | descent    |
 
-            | Baseline/Metric   | Coordinate | BASE Value | OS/2 Value     | hhea Value |
-            |-------------------|------------|------------|----------------|------------|
-            | ascent            |        800 |            | sTypoAscender  | ascent     |
-            | ideographic-over  |        750 | idtp       |                |            |
-            | hanging           |        650 | hang       |                |            |
-            | cap-height        |        550 |            | sCapHeight     |            |
-            | math              |        450 | math       |                |            |
-            | /central/         |        350 |            |                |            |
-            | /em-middle/       |        300 |            |                |            |
-            | x-height          |        250 |            | sxHeight       |            |
-            | /x-middle/        |        150 |            |                |            |
-            | alphabetic        |         50 | romn       |                |            |
-            | /zero/            |            |            |                |            |
-            | ideographic-under |        -50 | ideo       |                |            |
-            | descent           |       -200 |            | sTypoDescender | descent    |
-
-            The `BaselineDiagnosticAlphabeticZero` variant is the same as `Baseline`,
+            The `BaselineDiagnosticAlphabeticZero` variant is the same as `BaselineDiagnostic`,
             except the alphabetic baseline is at the common value of 0. This also
             results in the x-middle baseline being at 125.
+
+            ## Glyphs
+
+            ### Diagnostic glyph
+
+            | Glyph | Codepoint | Description |
+            |-------|-----------|-------------|
+            | `X`   | U+0058    | All baselines drawn with labels |
+
+            ### Pair glyphs
+
+            Each baseline pair has two variants: a **layout** glyph (opaque filled rectangle
+            between the two baselines) and a **labeled** glyph (lines with text labels, like `X`).
+
+            | Pair                          | Layout | Layout codepoint | Labeled | Labeled codepoint |
+            |-------------------------------|--------|------------------|---------|-------------------|
+            | X-height + Alphabetic         | `x`    | U+0078           | `χ`     | U+03C7            |
+            | Cap-height + Alphabetic       | `B`    | U+0042           | `β`     | U+03B2            |
+            | Ideo em-box (idtp + ideo)     | `口`   | U+53E3           | `日`    | U+65E5            |
+            | Ideo face (icft + icfb)       | `中`   | U+4E2D           | `田`    | U+7530            |
+            | Hanging + Alphabetic          | `अ`    | U+0905           | `आ`     | U+0906            |
+            | Math + Alphabetic             | `+`    | U+002B           | `±`     | U+00B1            |
+
+            ### Em-box glyphs
+
+            | Variant | Glyph | Codepoint |
+            |---------|-------|-----------|
+            | Filled  | `█`   | U+2588    |
+            | Outline | `□`   | U+25A1    |
 
             ## Source and Downloads
             Both the source code and built font files can be found in the [`@sajidanwar.com/baseline-diagnostic-font`][tangled-repo]
