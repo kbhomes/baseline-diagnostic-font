@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="./baseline-diagnostic-font.css">
+  <style>
+    body {
+      width: 80ch;
+      margin: auto;
+      font: 16px/1.5 sans-serif;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    code {
+      background: #f8f8f8;
+      border: 1px dotted #ccc;
+      border-radius: 0.25em;
+      padding: 0.25em;
+      font-weight: bold;
+      font-size: smaller;
+    }
+
+    dfn {
+      text-decoration: 2px dotted underline;
+      cursor: help;
+    }
+
+    #preview, #embox-preview {
+      display: flex;
+      justify-content: space-evenly;
+      text-align: center;
+    }
+
+    table {
+      text-align: center;
+      font-family: monospace;
+      border-collapse: collapse;
+      margin: 1em auto;
+    }
+
+    table td, table th {
+      padding: 0.25em 0.5em;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #f8f8f8;
+    }
+
+    #baselines-table {
+      text-align: left;
+    }
+
+    #baselines-table td:nth-child(2) {
+      text-align: right;
+    }
+
+    .pair-cell {
+      text-align: center;
+    }
+
+    .glyph-render {
+      background: #fff;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+
+    .glyph-render.layout {
+      background: repeating-conic-gradient(#eee 0 25%, #0000 0 50%) 50% / 20px 20px;
+    }
+
+    .pair-name {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 1px;
+      background: black;
+    }
+
+    .pair-name span {
+      background: white;
+      padding: 4px;
+    }
+
+    .font-switch {
+      display: flex;
+      margin-bottom: 0.75em;
+      font-family: monospace;
+      font-size: 0.75em;
+      justify-content: center;
+    }
+
+    .font-switch input[type="radio"] {
+      display: none;
+    }
+
+    .font-switch label span {
+      display: block;
+      padding: 0.3em 0.75em;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      background: #f8f8f8;
+      user-select: none;
+    }
+
+    .font-switch label:first-child span {
+      border-radius: 4px 0 0 4px;
+    }
+
+    .font-switch label:last-child span {
+      border-radius: 0 4px 4px 0;
+      margin-left: -1px;
+    }
+
+    .font-switch input[type="radio"]:checked + span {
+      font-weight: bold;
+      border-color: #000;
+      background: white;
+      position: relative;
+    }
+
+    .font-switch input[type="radio"]:checked + span:after {
+      content: ' ✔';
+      font-weight: 900;
+    }
+
+    #pair-section:has([value="{{ font_name }}"]:checked) .glyph-render {
+      font-family: "{{ font_name }}";
+    }
+
+    #pair-section:has([value="{{ font_az_name }}"]:checked) .glyph-render {
+      font-family: "{{ font_az_name }}";
+    }
+  </style>
+</head>
+<body>
+  <h1>Baseline Diagnostic Font</h1>
+
+  <h2>Overview</h2>
+  <p>
+    Font that can be used for validating baseline alignments. Given the embedded
+    text in the font, this should be used with very large font sizes.
+  </p>
+
+  <h2>Baselines and Metrics</h2>
+  <table id="baselines-table" border="1">
+    <thead>
+      <tr>
+        <th>Baseline/Metric</th>
+        <th>Coordinate</th>
+        <th><code>BASE</code> Value</th>
+        <th><code>OS/2</code> Value</th>
+        <th><code>hhea</code> Value</th>
+      </tr>
+    </thead>
+    {% for b in baseline_table %}
+    <tr>
+      <td>{% if b.tooltip %}<dfn title="{{ b.tooltip }}">{{ b.id }}</dfn>{% else %}{{ b.id }}{% endif %}</td>
+      <td>{{ b.position }}</td>
+      <td>{{ b.base }}</td>
+      <td>{{ b.os2 }}</td>
+      <td>{{ b.hhea }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  <p>
+    The <code>{{ font_az_name }}</code> variant is the same as
+    <code>{{ font_name }}</code>, except
+    {% for diff in az_diffs %}<code>{{ diff.id }}</code> moves to {{ diff.position }}{% if not loop.last %}; {% endif %}{% endfor %}.
+  </p>
+
+  <h2>Glyphs</h2>
+
+  <h3>Diagnostic glyph</h3>
+  <p>
+    <code>X</code> (U+0058) draws all baselines with labels. Use at large font sizes.
+  </p>
+  <div id="preview">
+    <div>
+      <p><span class="glyph-render" style="font: 250px/1 '{{ font_name }}'">X</span></p>
+      <em><code>{{ font_name }}</code> at 250px</em>
+    </div>
+    <div>
+      <p><span class="glyph-render" style="font: 250px/1 '{{ font_az_name }}'">X</span></p>
+      <em><code>{{ font_az_name }}</code> at 250px</em>
+    </div>
+  </div>
+
+  <h3>Baseline pair glyphs</h3>
+  <p>
+    Each pair has a <strong>layout</strong> variant (opaque fill between the two
+    baselines) and a <strong>labeled</strong> variant (lines with labels, like
+    <code>X</code>). Labeled variants also show dashed reference lines for
+    <dfn title="Zero coordinate">zero</dfn> and
+    <dfn title="Computed at halfway between ascent and descent">em-middle</dfn>.
+  </p>
+  <div id="pair-section">
+    <div class="font-switch">
+      <label><input type="radio" name="pair-font" value="{{ font_name }}" checked><span>{{ font_name }}</span></label>
+      <label><input type="radio" name="pair-font" value="{{ font_az_name }}"><span>{{ font_az_name }}</span></label>
+    </div>
+    <table id="pair-table" border="1">
+      <thead>
+        <tr><th>Pair</th><th>Layout</th><th>Labeled</th></tr>
+      </thead>
+      {% for pair in pairs %}
+      <tr>
+        <td>
+          <div class="pair-name">
+            {% for id in pair.ids %}<span>{{ id }}</span>{% endfor %}
+          </div>
+        </td>
+        {% if pair.layout %}
+        <td class="pair-cell">
+          <span class="glyph-render layout" style="font-size: 150px; line-height: 1">{{ pair.layout.char }}</span>
+          <br><code>{{ pair.layout.char }}</code> ({{ pair.layout.codepoint }})
+        </td>
+        {% else %}
+        <td></td>
+        {% endif %}
+        {% if pair.labeled %}
+        <td class="pair-cell">
+          <span class="glyph-render" style="font-size: 150px; line-height: 1">{{ pair.labeled.char }}</span>
+          <br><code>{{ pair.labeled.char }}</code> ({{ pair.labeled.codepoint }})
+        </td>
+        {% else %}
+        <td></td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <h3>Em-box glyphs</h3>
+  <p>
+    Reference glyphs spanning the full em-box from ascent to descent.
+    Use them as solid or outlined background blocks without any baseline markings.
+  </p>
+  <div id="embox-preview">
+    {% if embox_filled %}
+    <div>
+      <p><span class="glyph-render" style="font: 150px/1 '{{ font_name }}'">{{ embox_filled.char }}</span></p>
+      <em><code>{{ embox_filled.char }}</code> ({{ embox_filled.codepoint }}) — Filled</em>
+    </div>
+    {% endif %}
+    {% if embox_outline %}
+    <div>
+      <p><span class="glyph-render" style="font: 150px/1 '{{ font_name }}'">{{ embox_outline.char }}</span></p>
+      <em><code>{{ embox_outline.char }}</code> ({{ embox_outline.codepoint }}) — Outline</em>
+    </div>
+    {% endif %}
+  </div>
+
+  <h2>Source and Downloads</h2>
+  <p>
+    Both the source code and built font files can be found in the
+    <a href="https://tangled.org/sajidanwar.com/baseline-diagnostic-font"><code>@sajidanwar.com/baseline-diagnostic-font</code></a>
+    repository on <a href="https://tangled.org">Tangled</a> or the
+    <a href="https://github.com/kbhomes/baseline-diagnostic-font"><code>kbhomes/baseline-diagnostic-font</code></a>
+    repository on <a href="https://github.com/">GitHub</a>.
+  </p>
+  <p>
+    This font is built using Python with the
+    <a href="https://fonttools.readthedocs.io/en/latest/">fonttools</a> library.
+  </p>
+
+  <h2>License</h2>
+  <p>
+    This font contains <a href="https://fonts.google.com/noto/specimen/Noto+Sans+Mono/license">Noto Sans Mono</a>
+    glyphs in the rendering of its baseline labels. Like that font, this font is
+    licensed under the
+    <a href="https://openfontlicense.org/open-font-license-official-text/">SIL Open Font License, Version 1.1</a>,
+    and is available in the
+    <a href="https://tangled.org/sajidanwar.com/baseline-diagnostic-font/blob/main/dist/LICENSE.md">source repository</a>.
+  </p>
+</body>
+</html>

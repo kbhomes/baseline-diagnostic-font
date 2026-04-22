@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="./baseline-diagnostic-font.css">
+  <style>
+    body {
+      width: 80ch;
+      margin: auto;
+      font: 16px/1.5 sans-serif;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    code {
+      background: #f8f8f8;
+      border: 1px dotted #ccc;
+      border-radius: 0.25em;
+      padding: 0.25em;
+      font-weight: bold;
+      font-size: smaller;
+    }
+
+    dfn {
+      text-decoration: 2px dotted underline;
+      cursor: help;
+    }
+
+    #preview, #embox-preview {
+      display: flex;
+      justify-content: space-evenly;
+      text-align: center;
+    }
+
+    table {
+      text-align: center;
+      font-family: monospace;
+      border-collapse: collapse;
+      margin: 1em auto;
+    }
+
+    table td, table th {
+      padding: 0.25em 0.5em;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #f8f8f8;
+    }
+
+    #baselines-table {
+      text-align: left;
+    }
+
+    #baselines-table td:nth-child(2) {
+      text-align: right;
+    }
+
+    .pair-cell {
+      text-align: center;
+    }
+
+    .glyph-render {
+      background: #fff;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+
+    .glyph-render.layout {
+      background: repeating-conic-gradient(#eee 0 25%, #0000 0 50%) 50% / 20px 20px;
+    }
+
+    .pair-name {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 1px;
+      background: black;
+    }
+
+    .pair-name span {
+      background: white;
+      padding: 4px;
+    }
+
+    .font-switch {
+      display: flex;
+      margin-bottom: 0.75em;
+      font-family: monospace;
+      font-size: 0.75em;
+      justify-content: center;
+    }
+
+    .font-switch input[type="radio"] {
+      display: none;
+    }
+
+    .font-switch label span {
+      display: block;
+      padding: 0.3em 0.75em;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      background: #f8f8f8;
+      user-select: none;
+    }
+
+    .font-switch label:first-child span {
+      border-radius: 4px 0 0 4px;
+    }
+
+    .font-switch label:last-child span {
+      border-radius: 0 4px 4px 0;
+      margin-left: -1px;
+    }
+
+    .font-switch input[type="radio"]:checked + span {
+      font-weight: bold;
+      border-color: #000;
+      background: white;
+      position: relative;
+    }
+
+    .font-switch input[type="radio"]:checked + span:after {
+      content: ' ✔';
+      font-weight: 900;
+    }
+
+    #pair-section:has([value="BaselineDiagnostic"]:checked) .glyph-render {
+      font-family: "BaselineDiagnostic";
+    }
+
+    #pair-section:has([value="BaselineDiagnosticAlphabeticZero"]:checked) .glyph-render {
+      font-family: "BaselineDiagnosticAlphabeticZero";
+    }
+  </style>
+</head>
+<body>
+  <h1>Baseline Diagnostic Font</h1>
+
+  <h2>Overview</h2>
+  <p>
+    Font that can be used for validating baseline alignments. Given the embedded
+    text in the font, this should be used with very large font sizes.
+  </p>
+
+  <h2>Baselines and Metrics</h2>
+  <table id="baselines-table" border="1">
+    <thead>
+      <tr>
+        <th>Baseline/Metric</th>
+        <th>Coordinate</th>
+        <th><code>BASE</code> Value</th>
+        <th><code>OS/2</code> Value</th>
+        <th><code>hhea</code> Value</th>
+      </tr>
+    </thead>
+    <tr>
+      <td>ascent</td>
+      <td>800</td>
+      <td></td>
+      <td>sTypoAscender</td>
+      <td>ascent</td>
+    </tr>
+    <tr>
+      <td>ideographic-over</td>
+      <td>750</td>
+      <td>idtp</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>hanging</td>
+      <td>650</td>
+      <td>hang</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>ideographic-face-over</td>
+      <td>650</td>
+      <td>icft</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>cap-height</td>
+      <td>550</td>
+      <td></td>
+      <td>sCapHeight</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>math</td>
+      <td>450</td>
+      <td>math</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><dfn title="Computed at halfway between ideographic-under and ideographic-over">central</dfn></td>
+      <td>350</td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><dfn title="Computed at halfway between ascent and descent">em-middle</dfn></td>
+      <td>300</td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>x-height</td>
+      <td>250</td>
+      <td></td>
+      <td>sxHeight</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><dfn title="Computed at halfway between alphabetic and x-height">x-middle</dfn></td>
+      <td>150</td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>alphabetic</td>
+      <td>50</td>
+      <td>romn</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>ideographic-face-under</td>
+      <td>50</td>
+      <td>icfb</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><dfn title="Zero coordinate">zero</dfn></td>
+      <td>0</td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>ideographic-under</td>
+      <td>-50</td>
+      <td>ideo</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>descent</td>
+      <td>-200</td>
+      <td></td>
+      <td>sTypoDescender</td>
+      <td>descent</td>
+    </tr>
+  </table>
+  <p>
+    The <code>BaselineDiagnosticAlphabeticZero</code> variant is the same as
+    <code>BaselineDiagnostic</code>, except
+<code>alphabetic</code> moves to 0; <code>x-middle</code> moves to 125.
+  </p>
+
+  <h2>Glyphs</h2>
+
+  <h3>Diagnostic glyph</h3>
+  <p>
+    <code>X</code> (U+0058) draws all baselines with labels. Use at large font sizes.
+  </p>
+  <div id="preview">
+    <div>
+      <p><span class="glyph-render" style="font: 250px/1 'BaselineDiagnostic'">X</span></p>
+      <em><code>BaselineDiagnostic</code> at 250px</em>
+    </div>
+    <div>
+      <p><span class="glyph-render" style="font: 250px/1 'BaselineDiagnosticAlphabeticZero'">X</span></p>
+      <em><code>BaselineDiagnosticAlphabeticZero</code> at 250px</em>
+    </div>
+  </div>
+
+  <h3>Baseline pair glyphs</h3>
+  <p>
+    Each pair has a <strong>layout</strong> variant (opaque fill between the two
+    baselines) and a <strong>labeled</strong> variant (lines with labels, like
+    <code>X</code>). Labeled variants also show dashed reference lines for
+    <dfn title="Zero coordinate">zero</dfn> and
+    <dfn title="Computed at halfway between ascent and descent">em-middle</dfn>.
+  </p>
+  <div id="pair-section">
+    <div class="font-switch">
+      <label><input type="radio" name="pair-font" value="BaselineDiagnostic" checked><span>BaselineDiagnostic</span></label>
+      <label><input type="radio" name="pair-font" value="BaselineDiagnosticAlphabeticZero"><span>BaselineDiagnosticAlphabeticZero</span></label>
+    </div>
+    <table id="pair-table" border="1">
+      <thead>
+        <tr><th>Pair</th><th>Layout</th><th>Labeled</th></tr>
+      </thead>
+      <tr>
+        <td>
+          <div class="pair-name">
+<span>x-height</span><span>alphabetic</span>          </div>
+        </td>
+        <td class="pair-cell">
+          <span class="glyph-render layout" style="font-size: 150px; line-height: 1">x</span>
+          <br><code>x</code> (U+0078)
+        </td>
+        <td class="pair-cell">
+          <span class="glyph-render" style="font-size: 150px; line-height: 1">χ</span>
+          <br><code>χ</code> (U+03C7)
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div class="pair-name">
+<span>cap-height</span><span>alphabetic</span>          </div>
+        </td>
+        <td class="pair-cell">
+          <span class="glyph-render layout" style="font-size: 150px; line-height: 1">B</span>
+          <br><code>B</code> (U+0042)
+        </td>
+        <td class="pair-cell">
+          <span class="glyph-render" style="font-size: 150px; line-height: 1">β</span>
+          <br><code>β</code> (U+03B2)
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div class="pair-name">
+<span>ideographic-over</span><span>ideographic-under</span>          </div>
+        </td>
+        <td class="pair-cell">
+          <span class="glyph-render layout" style="font-size: 150px; line-height: 1">口</span>
+          <br><code>口</code> (U+53E3)
+        </td>
+        <td class="pair-cell">
+          <span class="glyph-render" style="font-size: 150px; line-height: 1">日</span>
+          <br><code>日</code> (U+65E5)
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div class="pair-name">
+<span>ideographic-face-over</span><span>ideographic-face-under</span>          </div>
+        </td>
+        <td class="pair-cell">
+          <span class="glyph-render layout" style="font-size: 150px; line-height: 1">中</span>
+          <br><code>中</code> (U+4E2D)
+        </td>
+        <td class="pair-cell">
+          <span class="glyph-render" style="font-size: 150px; line-height: 1">田</span>
+          <br><code>田</code> (U+7530)
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div class="pair-name">
+<span>hanging</span><span>alphabetic</span>          </div>
+        </td>
+        <td class="pair-cell">
+          <span class="glyph-render layout" style="font-size: 150px; line-height: 1">अ</span>
+          <br><code>अ</code> (U+0905)
+        </td>
+        <td class="pair-cell">
+          <span class="glyph-render" style="font-size: 150px; line-height: 1">आ</span>
+          <br><code>आ</code> (U+0906)
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div class="pair-name">
+<span>math</span><span>alphabetic</span>          </div>
+        </td>
+        <td class="pair-cell">
+          <span class="glyph-render layout" style="font-size: 150px; line-height: 1">+</span>
+          <br><code>+</code> (U+002B)
+        </td>
+        <td class="pair-cell">
+          <span class="glyph-render" style="font-size: 150px; line-height: 1">±</span>
+          <br><code>±</code> (U+00B1)
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <h3>Em-box glyphs</h3>
+  <p>
+    Reference glyphs spanning the full em-box from ascent to descent.
+    Use them as solid or outlined background blocks without any baseline markings.
+  </p>
+  <div id="embox-preview">
+    <div>
+      <p><span class="glyph-render" style="font: 150px/1 'BaselineDiagnostic'">█</span></p>
+      <em><code>█</code> (U+2588) — Filled</em>
+    </div>
+    <div>
+      <p><span class="glyph-render" style="font: 150px/1 'BaselineDiagnostic'">□</span></p>
+      <em><code>□</code> (U+25A1) — Outline</em>
+    </div>
+  </div>
+
+  <h2>Source and Downloads</h2>
+  <p>
+    Both the source code and built font files can be found in the
+    <a href="https://tangled.org/sajidanwar.com/baseline-diagnostic-font"><code>@sajidanwar.com/baseline-diagnostic-font</code></a>
+    repository on <a href="https://tangled.org">Tangled</a> or the
+    <a href="https://github.com/kbhomes/baseline-diagnostic-font"><code>kbhomes/baseline-diagnostic-font</code></a>
+    repository on <a href="https://github.com/">GitHub</a>.
+  </p>
+  <p>
+    This font is built using Python with the
+    <a href="https://fonttools.readthedocs.io/en/latest/">fonttools</a> library.
+  </p>
+
+  <h2>License</h2>
+  <p>
+    This font contains <a href="https://fonts.google.com/noto/specimen/Noto+Sans+Mono/license">Noto Sans Mono</a>
+    glyphs in the rendering of its baseline labels. Like that font, this font is
+    licensed under the
+    <a href="https://openfontlicense.org/open-font-license-official-text/">SIL Open Font License, Version 1.1</a>,
+    and is available in the
+    <a href="https://tangled.org/sajidanwar.com/baseline-diagnostic-font/blob/main/dist/LICENSE.md">source repository</a>.
+  </p>
+</body>
+</html>
